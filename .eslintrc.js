@@ -22,4 +22,5 @@ module.exports = {
     "react/prop-types": RULES.OFF,
     "react/react-in-jsx-scope": RULES.OFF,
   },
+  exclude: ["node_modules"],
 };
