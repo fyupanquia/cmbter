@@ -1,6 +1,7 @@
 import { colors } from "../../styles/theme";
 
 export default function Button({ children, onClick }) {
+  const a = "";
   return (
     <>
       <button onClick={onClick}>{children}</button>
