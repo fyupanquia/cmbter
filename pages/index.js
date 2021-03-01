@@ -1,30 +1,32 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Head from "next/head";
-import Layout from "@c/Layout";
-import { colors } from "styles/theme";
-import Button from "@c/Button";
-import GitHub from "@c/Icons/GitHub";
-import Avatar from "@c/Avatar";
-import Logo from "@c/Icons/Logo";
 
-import { loginWithGitHub, onAuthStateChanged } from "firebase/client";
+import Layout from "components/Layout";
+import Button from "components/Button";
+import GitHub from "components/Icons/GitHub";
+import Logo from "components/Icons/Logo";
+
+import { colors } from "styles/theme";
+
+import { loginWithGitHub } from "firebase/client";
+
+import { useRouter } from "next/router";
+import useUser, { USER_STATES } from "hooks/useUser";
 
 export default function Home() {
-  const [user, setUser] = useState(undefined);
+  const user = useUser();
+  const router = useRouter();
 
   useEffect(() => {
-    onAuthStateChanged(setUser);
-  }, []);
+    user && router.replace("/home");
+  }, [user]);
 
   const handleClick = () => {
-    loginWithGitHub()
-      .then(setUser)
-      .catch((err) => {
-        console.log("err: ", err);
-      });
+    loginWithGitHub().catch((err) => {
+      console.log(err);
+    });
   };
 
-  console.log("user:", user);
   return (
     <>
       <Head>
@@ -43,21 +45,13 @@ export default function Home() {
           </h2>
 
           <div>
-            {user === null && (
+            {user === USER_STATES.NOT_LOGGED && (
               <Button onClick={handleClick}>
                 <GitHub fill="#fff" width={24} height={24} />
                 Login with GitHub
               </Button>
             )}
-            {user && user.avatar && (
-              <div>
-                <Avatar
-                  src={user.avatar}
-                  alt={user.username}
-                  text={user.email}
-                />
-              </div>
-            )}
+            {user === USER_STATES.NOT_KNOWN && <img src="/spinner.gif" />}
           </div>
         </section>
       </Layout>
@@ -78,6 +72,7 @@ export default function Home() {
         h1 {
           color: ${colors.primary};
           font-weight: 800;
+          font-size: 32px;
           margin-bottom: 16px;
         }
         h2 {
