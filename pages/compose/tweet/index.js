@@ -31,7 +31,7 @@ export default function ComposeTweet() {
       avatar: user.avatar,
       content: message,
       userId: user.uid,
-      userName: user.username,
+      userName: user.email,
     })
       .then(() => {
         router.push("/home");
