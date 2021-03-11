@@ -1,14 +1,6 @@
 import firebase from "firebase";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyB-Nxfu1_GTqW2boDyAc9j4-SpsCEwxT2s",
-  authDomain: "local-vue-ex.firebaseapp.com",
-  databaseURL: "https://local-vue-ex.firebaseio.com",
-  projectId: "local-vue-ex",
-  storageBucket: "local-vue-ex.appspot.com",
-  messagingSenderId: "546366388020",
-  appId: "1:546366388020:web:a457c908f7f40cbde5d761",
-};
+const firebaseConfig = JSON.parse(process.env.NEXT_PUBLIC_FIREBASE_CONFIG);
 
 !firebase.apps.length && firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
@@ -48,6 +40,29 @@ export const addDevit = ({ avatar, content, img, userId, userName }) => {
     likesCount: 0,
     sharedCount: 0,
   });
+};
+
+const mapDevitFromFirebaseToDevitObject = (doc) => {
+  const data = doc.data();
+  const id = doc.id;
+  const { createdAt } = data;
+
+  return {
+    ...data,
+    id,
+    createdAt: +createdAt.toDate(),
+  };
+};
+
+export const listenLatestDevits = (callback) => {
+  return db
+    .collection("devits")
+    .orderBy("createdAt", "desc")
+    .limit(20)
+    .onSnapshot(({ docs }) => {
+      const newDevits = docs.map(mapDevitFromFirebaseToDevitObject);
+      callback(newDevits);
+    });
 };
 
 export const fetchLatestDevits = () => {

@@ -558,3 +558,4 @@ yarn-error.log*
 # vercel
 .vercel
 .repo
+serviceAccountKey.json
